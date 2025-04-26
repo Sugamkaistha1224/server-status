@@ -1,0 +1,603 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-600 text-white p-6">
+        <h1 class="text-2xl font-bold mb-8"> EduSphere </h1>
+        <nav>
+            <ul class="space-y-4">
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('emailLogs')"><i class="fas fa-envelope"></i><span>Email Logs</span></a></li>
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('domains')"><i class="fas fa-globe"></i><span>Domains</span></a></li>
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('integration')"><i class="fas fa-cogs"></i><span>Integration</span></a></li>
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('billing')"><i class="fas fa-credit-card"></i><span>Billing</span></a></li>
+                <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('settings')"><i class="fas fa-sliders-h"></i><span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-semibold" id="pageTitle">Dashboard</h2>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search domains or emails..." id="searchInput" class="bg-white dark:bg-gray-800 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="filterSearch()">
+                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="balanceInfo" class="hidden sm:block">Balance: <strong>100/299930</strong> emails</span>
+                    <button onclick="alert('Upgrade feature coming soon')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Upgrade</button>
+                </div>
+                <button onclick="toggleDarkMode()" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
+                    <i class="fas fa-moon dark:text-yellow-300"></i>
+                </button>
+                <div class="relative">
+                    <img src="/api/placeholder/40/40" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfileMenu()">
+                    <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 hidden">
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <!-- Date Filters -->
+            <div class="mb-4">
+                <label for="dateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Filter:</label>
+                <select id="dateFilter" class="bg-white dark:bg-gray-800 rounded py-2 px-4" onchange="filterStats(this.value)">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="7days">Last 7 Days</option>
+                    <option value="month">This Month</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <input type="date" id="customStartDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden">
+                <input type="date" id="customEndDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden" onchange="filterStats('custom')">
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Total Emails Sent</h3>
+                    <p class="text-2xl font-bold text-blue-600 totalEmailsSent">1,234,567</p>
+                    <p class="text-sm">+10% from previous period</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Delivery Rate</h3>
+                    <p class="text-2xl font-bold text-green-600 deliveryRate">98.7%</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Failed Emails</h3>
+                    <p class="text-2xl font-bold text-red-600 failedEmails">1,345</p>
+                    <p class="text-sm">+2% from previous period</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Bounced Emails</h3>
+                    <p class="text-2xl font-bold text-red-600 bouncedEmails">250</p>
+                    <p class="text-sm">-5% from previous period</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Opened Emails</h3>
+                    <p class="text-2xl font-bold text-yellow-600 openedEmails">78,500</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-2">Clicked Emails</h3>
+                    <p class="text-2xl font-bold text-blue-600 clickedEmails">50,200</p>
+                </div>
+      more stats
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Email Activity</h3>
+                    <canvas id="emailActivityChart"></canvas>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Delivery Status</h3>
+                    <canvas id="deliveryStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Logs Tab -->
+        <div id="emailLogs" class="tab-content hidden">
+            <div class="mb-4">
+                <label for="logsDateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Filter:</label>
+                <select id="logsDateFilter" class="bg-white dark:bg-gray-800 rounded py-2 px-4" onchange="filterLogs(this.value)">
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="7days">Last 7 Days</option>
+                    <option value="month">This Month</option>
+                    <option value="custom">Custom</option>
+                </select>
+                <input type="date" id="logsCustomStartDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden">
+                <input type="date" id="logsCustomEndDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden" onchange="filterLogs('custom')">
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <table class="w-full">
+                    <thead>
+                    <tr class="border-b dark:border-gray-700">
+                        <th class="text-left py-2">Date</th>
+                        <th class="text-left py-2">Recipient</th>
+                        <th class="text-left py-2">Subject</th>
+                        <th class="text-left py-2">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody id="emailLogsTable">
+                    <!-- Sample Logs -->
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">2024-07-13 15:30</td>
+                        <td class="py-2">sugamkaistha95@gmail.com</td>
+                        <td class="py-2">Welcome to Our Service</td>
+                        <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Delivered</span></td>
+                    </tr>
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">2024-07-13 15:28</td>
+                        <td class="py-2">agamkaistha11@gmail.com</td>
+                        <td class="py-2">Your Monthly Newsletter</td>
+                        <td class="py-2"><span class="bg-red-200 text-red-800 py-1 px-2 rounded-full text-sm">Bounced</span></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">2024-07-13 15:25</td>
+                        <td class="py-2">ekantkholi1@gmail.com</td>
+                        <td class="py-2">Order Confirmation #12345</td>
+                        <td class="py-2"><span class="bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full text-sm">Failed</span></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">2024-07-13 15:20</td>
+                        <td class="py-2">purvanshkaistha97@gmail.com</td>
+                        <td class="py-2">This Week's Updates</td>
+                        <td class="py-2"><span class="bg-blue-200 text-blue-800 py-1 px-2 rounded-full text-sm">Clicked</span></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">2024-07-13 15:18</td>
+                        <td class="py-2">shubhamsahani112@gmail.com</td>
+                        <td class="py-2">Follow-up on Your Recent Purchase</td>
+                        <td class="py-2"><span class="bg-orange-200 text-orange-800 py-1 px-2 rounded-full text-sm">Opened</span></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">2024-07-13 15:15</td>
+                        <td class="py-2">sugamkaistha12@gmail.com</td>
+                        <td class="py-2">Your Password Reset Link</td>
+                        <td class="py-2"><span class="bg-red-200 text-red-800 py-1 px-2 rounded-full text-sm">Complaint</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Domains Tab -->
+        <div id="domains" class="tab-content hidden">
+            <div class="flex justify-between mb-6">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showEmailSenderModal()">Add Email Sender</button>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <table class="w-full">
+                    <thead>
+                    <tr class="border-b dark:border-gray-700">
+                        <th class="text-left py-2">Domain</th>
+                        <th class="text-left py-2">Status</th>
+                        <th class="text-left py-2">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">example.com</td>
+                        <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
+                        <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2">newdomain.com</td>
+                        <td class="py-2"><span class="bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full text-sm">Pending</span></td>
+                        <td class="py-2"><a href="#" class="text-blue-600 hover:underline">Verify Now</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Integration Tab -->
+        <div id="integration" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div class="tabs">
+                    <button class="tab-button active" onclick="showIntegrationTab('smtpCredentials')">SMTP Credentials</button>
+                    <button class="tab-button" onclick="showIntegrationTab('apiDoc')">API Documentation</button>
+                </div>
+                <div id="smtpCredentials" class="integration-tab-content show">
+                    <h3 class="text-xl font-semibold mb-4">SMTP Credentials</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="font-semibold">Host:</p>
+                            <p>smtp.smtpserver.com</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Port:</p>
+                            <p>587</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Username:</p>
+                            <p>your_username</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Password:</p>
+                            <p>••••••••••••</p>
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regeneratePassword()">Regenerate Password</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="apiDoc" class="integration-tab-content">
+                    <h3 class="text-xl font-semibold mb-4">API Documentation</h3>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regenerateApiKey()">Generate New API Key</button>
+                    <p class="mt-4 font-semibold">API Key:</p>
+                    <p>sk_live_abcdefghijklmnopqrstuvwxyz123456</p>
+
+                    <h4 class="text-lg mt-6">API Usage</h4>
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="showApiExample('curl')">CURL</button>
+                        <button class="tab-button" onclick="showApiExample('python')">Python</button>
+                        <button class="tab-button" onclick="showApiExample('nodejs')">Node.js</button>
+                    </div>
+                    <div id="curl" class="api-example show">
+                        <pre><code>// Example usage with CURL
+curl -X POST https://api.smtpserver.com/send \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+          "to": "user@example.com",
+          "subject": "Hello World",
+          "text": "This is a test email"
+         }'</code></pre>
+                    </div>
+                    <div id="python" class="api-example hidden">
+                        <pre><code>// Example usage with Python
+import requests
+
+url = "https://api.smtpserver.com/send"
+payload = {
+    "to": "user@example.com",
+        "subject": "Hello World",
+    "text": "This is a test email"
+}
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+response = requests.post(url, json=payload, headers=headers)
+print(response.json())</code></pre>
+                    </div>
+                    <div id="nodejs" class="api-example hidden">
+                        <pre><code>// Example usage with Node.js
+const axios = require('axios');
+
+const data = {
+    to: 'user@example.com',
+    subject: 'Hello World',
+    text: 'This is a test email'
+};
+
+axios.post('https://api.smtpserver.com/send', data, {
+    headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    }
+})
+.then(response => {
+    console.log(response.data);
+})
+.catch(error => {
+    console.error(error);
+});</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Billing Tab -->
+        <div id="billing" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-xl font-semibold mb-4">Billing</h3>
+                <p class="mb-4">Current Plan: <strong>Starter Plan</strong></p>
+                <p class="text-sm mb-4">Emails remaining: <strong>100 / 299930</strong></p>
+                <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onclick="alert('Upgrade feature coming soon')">Upgrade Plan</button>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-xl font-semibold mb-4">Account Settings</h3>
+                <form class="space-y-4">
+                    <div>
+                        <label for="fullName" class="block mb-1">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label for="email" class="block mb-1">Email Address</label>
+                        <input type="email" id="email" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label for="password" class="block mb-1">New Password</label>
+                        <input type="password" id="password" name="password" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <div>
+                        <label for="confirmPassword" class="block mb-1">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modals -->
+<div id="domainModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <!-- Add Domain Modal -->
+            <h3 class="text-xl font-semibold mb-4">Add Domain</h3>
+            <form id="addDomainForm" class="space-y-4">
+                <div>
+                    <label for="domainName" class="block mb-1">Domain Name</label>
+                    <input type="text" id="domainName" name="domainName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="simulateAddDomain()">Add Domain</button>
+                <button type="button" class="ml-2 text-gray-700 dark:text-gray-300" onclick="closeDomainModal()">Cancel</button>
+            </form>
+            <div id="dnsRecords" class="hidden mt-8">
+                <h3>Add the following DNS records to your domain:</h3>
+                <ul class="list-disc pl-5">
+                    <li>TXT Record: <span id="domainTxtRecord">TXT_RECORD_EXAMPLE</span></li>
+                    <li>DKIM Record: <span id="domainDkimRecord">DKIM_RECORD_EXAMPLE</span></li>
+                    <li>MX Record: <span id="domainMxRecord">MX_RECORD_EXAMPLE</span></li>
+                </ul>
+                <p class="mt-4">After adding the DNS records, please wait up to 48 hours for the changes to propagate and then click the "Verify" button below.</p>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-4" onclick="verifyDomain()">Verify</button>
+                <p id="verificationMessage" class="mt-4"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="emailSenderModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <!-- Add Email Sender Modal -->
+            <h3 class="text-xl font-semibold mb-4">Add Email Sender</h3>
+            <form id="addEmailSenderForm" class="space-y-4">
+                <div>
+                    <label for="emailSender" class="block mb-1">Email Address</label>
+                    <input type="email" id="emailSender" name="emailSender" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="simulateAddEmailSender()">Add Email Sender</button>
+                <button type="button" class="ml-2 text-gray-700 dark:text-gray-300" onclick="closeEmailSenderModal()">Cancel</button>
+            </form>
+            <div id="emailVerification" class="hidden mt-8">
+                <p>Please check your inbox for the verification email and click the link to verify.</p>
+                <p id="emailVerificationMessage" class="mt-4"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to show/hide tabs
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+    }
+
+    // Function to toggle dark mode
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    }
+
+    // Function to toggle profile menu
+    function toggleProfileMenu() {
+        const menu = document.getElementById('profileMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    // Function to filter stats by different time ranges
+    function filterStats(range) {
+        document.getElementById('customStartDate').classList.add('hidden');
+        document.getElementById('customEndDate').classList.add('hidden');
+        if (range === 'custom') {
+            document.getElementById('customStartDate').classList.remove('hidden');
+            document.getElementById('customEndDate').classList.remove('hidden');
+            return;
+        }
+        
+        // Sample data
+        const stats = {
+            totalEmailsSent: 1234567,
+            deliveryRate: 98.7,
+            failedEmails: 1345,
+            failedRate: 1.3,
+            bouncedEmails: 250,
+            bouncedRate: 0.21,
+            openedEmails: 78500,
+            openedRate: 6.36,
+            clickedEmails: 50200,
+            clickedRate: 4.06,
+            complaints: 320,
+            complaintsRate: 0.026
+        };
+
+        // Implement your filtering logic here
+        console.log('Filtering stats by:', range);
+
+        // Update stats data based on the filter
+        document.querySelector('.totalEmailsSent').textContent = stats.totalEmailsSent;
+        document.querySelector('.deliveryRate').textContent = `${stats.deliveryRate}%`;
+        document.querySelector('.failedEmails').textContent = stats.failedEmails;
+        document.querySelector('.bouncedEmails').textContent = stats.bouncedEmails;
+        document.querySelector('.openedEmails').textContent = stats.openedEmails;
+        document.querySelector('.clickedEmails').textContent = stats.clickedEmails;
+        document.querySelector('.complaints').textContent = stats.complaints;
+    }
+
+    // Function to filter logs by different time ranges
+    function filterLogs(range) {
+        document.getElementById('logsCustomStartDate').classList.add('hidden');
+        document.getElementById('logsCustomEndDate').classList.add('hidden');
+        if (range === 'custom') {
+            document.getElementById('logsCustomStartDate').classList.remove('hidden');
+            document.getElementById('logsCustomEndDate').classList.remove('hidden');
+            return;
+        }
+        
+        // Implement your filtering logic here
+        console.log('Filtering logs by:', range);
+    }
+
+    // Add Domain function
+    function showDomainModal() {
+        document.getElementById('domainModal').classList.remove('hidden');
+    }
+
+    function closeDomainModal() {
+        document.getElementById('domainModal').classList.add('hidden');
+        document.getElementById('dnsRecords').classList.add('hidden');
+    }
+
+    function simulateAddDomain() {
+        // Show DNS records guidance after domain added
+        document.getElementById('dnsRecords').classList.remove('hidden');
+    }
+
+    // Domain verification function
+    function verifyDomain() {
+        // Simulate verification logic
+        const isVerified = true; // Replace with real verification logic
+        const messageElement = document.getElementById('verificationMessage');
+        if (isVerified) {
+            messageElement.textContent = "Your domain has been verified successfully!";
+        } else {
+            messageElement.textContent = "Your domain is not verified yet. Please add the DNS records and try again.";
+        }
+        alert(isVerified ? "Domain verified successfully!" : "Verification failed. Please ensure the DNS records are correct.");
+    }
+
+    // Add Email Sender function
+    function showEmailSenderModal() {
+        document.getElementById('emailSenderModal').classList.remove('hidden');
+    }
+
+    function closeEmailSenderModal() {
+        document.getElementById('emailSenderModal').classList.add('hidden');
+        document.getElementById('emailVerification').classList.add('hidden');
+    }
+
+    function simulateAddEmailSender() {
+        // Show email verification guidance after email sender added
+        document.getElementById('emailVerification').classList.remove('hidden');
+        alert('Verification email sent to the provided address.');
+    }
+
+    // Function to regenerate password
+    function regeneratePassword() {
+        alert('Password regenerated successfully');
+    }
+
+    // Function to regenerate API key
+    function regenerateApiKey() {
+        alert('API Key generated successfully');
+    }
+
+    // Function to show API examples
+    function showApiExample(exampleId) {
+        document.querySelectorAll('.api-example').forEach(example => example.classList.add('hidden'));
+        document.getElementById(exampleId).classList.remove('hidden');
+    }
+
+    // Function to show integration tabs
+    function showIntegrationTab(tabId) {
+        document.querySelectorAll('.integration-tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+    }
+
+    // Function to filter search results
+    function filterSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Implement your filtering logic for domains and emails here
+        console.log('Searching for:', query);
+    }
+
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+    }
+
+    // Email Activity Chart
+    const emailActivityCtx = document.getElementById('emailActivityChart').getContext('2d');
+    new Chart(emailActivityCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Emails Sent',
+                data: [1200, 1900, 3000, 5000, 2000, 3000, 4000],
+                borderColor: 'rgb(59, 130, 246)',
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Delivery Status Chart
+    const deliveryStatusCtx = document.getElementById('deliveryStatusChart').getContext('2d');
+    new Chart(deliveryStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Delivered', 'Bounced', 'Spam', 'Opened', 'Clicked', 'Complaints', 'Failed'],
+            datasets: [{
+                data: [70, 10, 5, 25, 15, 3, 7],
+                backgroundColor: ['#10B981', '#EF4444', '#F59E0B', '#FBBF24', '#38BDF8', '#A78BFA', '#F43F5E']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('domainModal')) {
+            closeDomainModal();
+        }
+        if (e.target === document.getElementById('emailSenderModal')) {
+            closeEmailSenderModal();
+        }
+    });
+</script>
+</body>
+</html>
