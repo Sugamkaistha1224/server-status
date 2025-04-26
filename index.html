@@ -32,24 +32,74 @@
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-semibold" id="pageTitle">Dashboard</h2>
-            <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-4">
+   <div class="relative">
+    <input type="search" placeholder="Search..." id="searchInput" 
+        class="bg-white dark:bg-gray-800 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        oninput="highlightSearch()">
+    <button class="search-btn" type="button" onclick="highlightText()">
+        <i class='bx bx-search'></i>
+    </button>
+    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+</div>
+
+
+
+  
+<style>
+  /* Highlight effect */
+mark {
+    background-color: yellow;
+    color: black;
+    padding: 0 4px;
+    border-radius: 3px;
+}
+
+</style>
+<script>
+function highlightSearch() {
+    // Remove old highlights first
+    const oldMarks = document.querySelectorAll('mark');
+    oldMarks.forEach(mark => {
+        const parent = mark.parentNode;
+        parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    });
+}
+
+function highlightText() {
+    const input = document.getElementById("searchInput").value.trim();
+    if (input === "") return; // Do nothing if empty
+
+    // Find all text-containing elements
+    const elements = document.body.getElementsByTagName('*');
+    
+    for (let element of elements) {
+        if (element.children.length === 0 && element.innerText) {  // Only text-containing elements
+            highlightTextInElement(element, input);
+        }
+    }
+}
+
+function highlightTextInElement(element, input) {
+    const text = element.innerText;
+    const regex = new RegExp(`(${input})`, "gi"); // Case insensitive
+
+    if (regex.test(text)) {
+        const newHTML = text.replace(regex, `<mark>$1</mark>`);
+        element.innerHTML = newHTML; // Update the element's content with highlighted text
+    }
+}
+</script>
+
+                
+
                 <div class="relative">
-                    <input type="text" placeholder="Search domains or emails..." id="searchInput" class="bg-white dark:bg-gray-800 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="filterSearch()">
-                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span id="balanceInfo" class="hidden sm:block">Balance: <strong>100/299930</strong> emails</span>
-                    <button onclick="alert('Upgrade feature coming soon')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Upgrade</button>
-                </div>
-                <button onclick="toggleDarkMode()" class="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
-                    <i class="fas fa-moon dark:text-yellow-300"></i>
-                </button>
-                <div class="relative">
-                    <img src="/api/placeholder/40/40" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfileMenu()">
+                    <img src="https://sugamimage.carrd.co/assets/images/image49.png?v=d0af2455" alt="User Avatar" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfileMenu()">
                     <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 hidden">
-                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
-                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
+                        <a href="https://sugamkaisthagroups.w3spaces.com/Edusphere.html" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Edusphere</a>
+                        <a href="https://sugam-navation.w3spaces.com/Dashboard-Edusphere.html" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Virtual Zone</a>
+                       
                     </div>
                 </div>
             </div>
@@ -57,64 +107,215 @@
 
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content">
-            <!-- Date Filters -->
-            <div class="mb-4">
-                <label for="dateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Filter:</label>
-                <select id="dateFilter" class="bg-white dark:bg-gray-800 rounded py-2 px-4" onchange="filterStats(this.value)">
-                    <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
-                    <option value="7days">Last 7 Days</option>
-                    <option value="month">This Month</option>
-                    <option value="custom">Custom</option>
-                </select>
-                <input type="date" id="customStartDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden">
-                <input type="date" id="customEndDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden" onchange="filterStats('custom')">
-            </div>
+<!-- Date Filters -->
+<div class="mb-4">
+    <label for="dateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Filter:</label>
+    <select id="dateFilter" class="bg-white dark:bg-gray-800 rounded py-2 px-4" onchange="filterStats(this.value)">
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="7days">Last 7 Days</option>
+        <option value="month">This Month</option>
+        <option value="custom">Custom</option>
+    </select>
+    <input type="date" id="customStartDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden">
+    <input type="date" id="customEndDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden" onchange="filterStats('custom')">
+</div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Total Emails Sent</h3>
-                    <p class="text-2xl font-bold text-blue-600 totalEmailsSent">1,234,567</p>
-                    <p class="text-sm">+10% from previous period</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Delivery Rate</h3>
-                    <p class="text-2xl font-bold text-green-600 deliveryRate">98.7%</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Failed Emails</h3>
-                    <p class="text-2xl font-bold text-red-600 failedEmails">1,345</p>
-                    <p class="text-sm">+2% from previous period</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Bounced Emails</h3>
-                    <p class="text-2xl font-bold text-red-600 bouncedEmails">250</p>
-                    <p class="text-sm">-5% from previous period</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Opened Emails</h3>
-                    <p class="text-2xl font-bold text-yellow-600 openedEmails">78,500</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-2">Clicked Emails</h3>
-                    <p class="text-2xl font-bold text-blue-600 clickedEmails">50,200</p>
-                </div>
-      more stats
-            </div>
+<!-- Email Input Box (Updated) -->
+<div class="mb-6">
+    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+        <input 
+            type="email" 
+            id="emailInput" 
+            placeholder="Enter email to load stats..." 
+            class="flex-1 bg-gray-100 dark:bg-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-200" 
+            oninput="validateEmailInput()"
+        />
+        <button 
+            id="fetchButton"
+            onclick="fetchEmailStats()" 
+            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded flex items-center justify-center space-x-2 disabled:opacity-50"
+            disabled
+        >
+            <i class="fas fa-sync-alt"></i> 
+            <span>Fetch</span>
+        </button>
+    </div>
+    <p id="emailFetchStatus" class="text-xs text-gray-500 mt-2"></p>
+</div>
 
-            <!-- Charts -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-4">Email Activity</h3>
-                    <canvas id="emailActivityChart"></canvas>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-4">Delivery Status</h3>
-                    <canvas id="deliveryStatusChart"></canvas>
-                </div>
+<script>
+    function validateEmailInput() {
+        const emailInput = document.getElementById("emailInput").value.trim();
+        const fetchButton = document.getElementById("fetchButton");
+        const emailFetchStatus = document.getElementById("emailFetchStatus");
+        
+        // Regex to validate @gmail.com email
+        const isValidEmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+        if (isValidEmail.test(emailInput)) {
+            // Enable the fetch button if email is valid
+            fetchButton.disabled = false;
+            emailFetchStatus.textContent = ""; // Clear status message
+        } else {
+            // Disable the fetch button if email is invalid
+            fetchButton.disabled = true;
+            emailFetchStatus.textContent = "Please enter a valid Gmail address.";
+        }
+    }
+
+    function fetchEmailStats() {
+        const emailInput = document.getElementById("emailInput").value.trim();
+        const emailFetchStatus = document.getElementById("emailFetchStatus");
+
+        if (!emailInput) {
+            return; // Exit if no email is entered
+        }
+
+        // Update the status to indicate fetching
+        emailFetchStatus.textContent = "Fetching email stats...";
+
+        // Simulate fetching stats (replace this with your actual fetch call)
+        setTimeout(() => {
+            // Example response handling (replace with your own logic)
+            const response = {
+                totalEmailsSent: 1000,
+                deliveryRate: "98%",
+                failedEmails: 25,
+                bouncedEmails: 10
+            };
+
+            // Update the status message with fetched data
+            emailFetchStatus.textContent = `Stats for ${emailInput}: 
+            Total Emails Sent: ${response.totalEmailsSent},
+            Delivery Rate: ${response.deliveryRate},
+            Failed Emails: ${response.failedEmails},
+            Bounced Emails: ${response.bouncedEmails}`;
+        }, 2000); // Simulate a 2-second delay
+    }
+</script>
+
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Total Emails Sent</h3>
+        <p id="totalEmailsSent" class="text-2xl font-bold text-blue-600">0</p>
+        <p class="text-sm">+0% from previous period</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Delivery Rate</h3>
+        <p id="deliveryRate" class="text-2xl font-bold text-green-600">0%</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Failed Emails</h3>
+        <p id="failedEmails" class="text-2xl font-bold text-red-600">0</p>
+        <p class="text-sm">+0% from previous period</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Bounced Emails</h3>
+        <p id="bouncedEmails" class="text-2xl font-bold text-red-600">0</p>
+        <p class="text-sm">-0% from previous period</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Opened Emails</h3>
+        <p id="openedEmails" class="text-2xl font-bold text-yellow-600">0</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-2">Clicked Emails</h3>
+        <p id="clickedEmails" class="text-2xl font-bold text-blue-600">0</p>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+function fetchEmailStats() {
+    const email = document.getElementById('emailInput').value.trim();
+    const status = document.getElementById('emailFetchStatus');
+
+    if (!email) {
+        status.textContent = "⚠️ Please enter a valid email first.";
+        return;
+    }
+
+    status.textContent = "Fetching live data for " + email + "...";
+
+    setTimeout(() => {
+        // Random simulated data
+        const totalEmailsSent = Math.floor(Math.random() * 10000) + 1;
+        const deliveryRate = (Math.random() * (99 - 80) + 80).toFixed(2); // between 80% - 99%
+        const failedEmails = Math.floor(Math.random() * 500);
+        const bouncedEmails = Math.floor(Math.random() * 300);
+        const openedEmails = Math.floor(Math.random() * totalEmailsSent * 0.7);
+        const clickedEmails = Math.floor(Math.random() * openedEmails * 0.5);
+
+        animateCount('totalEmailsSent', 0, totalEmailsSent, 1000);
+        animateCount('deliveryRate', 0, deliveryRate, 1000, '%');
+        animateCount('failedEmails', 0, failedEmails, 1000);
+        animateCount('bouncedEmails', 0, bouncedEmails, 1000);
+        animateCount('openedEmails', 0, openedEmails, 1000);
+        animateCount('clickedEmails', 0, clickedEmails, 1000);
+
+        status.textContent = "✅ Live data updated for " + email;
+    }, 1000);
+}
+
+function animateCount(id, start, end, duration, suffix = '') {
+    const element = document.getElementById(id);
+    let startTime = null;
+
+    function animation(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const progress = currentTime - startTime;
+        const value = Math.min(Math.floor((progress / duration) * (end - start) + start), end);
+        element.textContent = suffix ? value + suffix : value.toLocaleString();
+        if (value < end) {
+            requestAnimationFrame(animation);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+</script>
+<!-- Replace charts with iframe -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 col-span-2">
+        <h3 class="text-lg font-semibold mb-4">Live Server Status of Edusphere Environments</h3>
+        <iframe src="https://sugamkaistha1224.github.io/live-status-server/" 
+            class="w-full h-[500px] rounded-lg border-2 border-blue-400" 
+            frameborder="0" 
+            loading="lazy">
+        </iframe>
+    </div>
+</div>
+
+<!-- Add this script at the bottom before </body> -->
+<script>
+function updateLiveData() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+
+    // Simulate a random live count for demo
+    const liveCount = Math.floor(Math.random() * 1000) + 100; // 100-1100
+
+    document.getElementById('liveCount').textContent = liveCount + " Users Online";
+    document.getElementById('liveTime').textContent = "Updated at: " + timeString;
+}
+
+// Update every 5 seconds
+setInterval(updateLiveData, 5000);
+
+// Initial call
+updateLiveData();
+</script>
+
             </div>
-        </div>
+        
 
         <!-- Email Logs Tab -->
         <div id="emailLogs" class="tab-content hidden">
@@ -186,9 +387,11 @@
         <!-- Domains Tab -->
         <div id="domains" class="tab-content hidden">
             <div class="flex justify-between mb-6">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showEmailSenderModal()">Add Email Sender</button>
+                 <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
+       
             </div>
+            
+
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <table class="w-full">
                     <thead>
@@ -198,14 +401,23 @@
                         <th class="text-left py-2">Action</th>
                     </tr>
                     </thead>
-                    <tbody>
+                   <tbody id="domainTableBody">
+                    <div id="domainModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+        <h2 class="text-xl font-semibold mb-4">Add Domain</h2>
+        <input type="url" id="domainInput" class="w-full p-2 mb-4 border rounded" placeholder="Enter domain URL">
+        <button onclick="addDomain()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Domain</button>
+        <button onclick="closeDomainModal()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded mt-4">Cancel</button>
+    </div>
+</div>
+
                     <tr class="border-b dark:border-gray-700">
-                        <td class="py-2">example.com</td>
+                        <td class="py-2">https://sugamkaisthagroups.w3spaces.com/Edusphere.html</td>
                         <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
                         <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
                     </tr>
                     <tr>
-                        <td class="py-2">newdomain.com</td>
+                        <td class="py-2">https://sugam-navation.w3spaces.com/Dashboard-Edusphere.html</td>
                         <td class="py-2"><span class="bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full text-sm">Pending</span></td>
                         <td class="py-2"><a href="#" class="text-blue-600 hover:underline">Verify Now</a></td>
                     </tr>
@@ -214,11 +426,59 @@
             </div>
         </div>
 
+<script>
+    // Show the Add Domain Modal
+    function showDomainModal() {
+        document.getElementById("domainModal").classList.remove("hidden");
+    }
+
+    // Close the Add Domain Modal
+    function closeDomainModal() {
+        document.getElementById("domainModal").classList.add("hidden");
+    }
+
+    // Show the Add Email Sender Modal
+    function showEmailSenderModal() {
+        document.getElementById("emailSenderModal").classList.remove("hidden");
+    }
+
+    // Close the Add Email Sender Modal
+    function closeEmailSenderModal() {
+        document.getElementById("emailSenderModal").classList.add("hidden");
+    }
+
+    // Add Domain to the table and mark it as "Verified"
+    function addDomain() {
+        const domainInput = document.getElementById("domainInput").value.trim();
+
+        // Validate domain input
+        if (!domainInput) {
+            alert("Please enter a valid domain.");
+            return;
+        }
+
+        // Create new row in the table
+        const tableBody = document.getElementById("domainTableBody");
+        const newRow = document.createElement("tr");
+
+        newRow.innerHTML = `
+            <td class="py-2">${domainInput}</td>
+            <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
+            <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
+        `;
+        tableBody.appendChild(newRow);
+
+        // Close the modal after adding domain
+        closeDomainModal();
+    }
+
+
+</script>
         <!-- Integration Tab -->
         <div id="integration" class="tab-content hidden">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="tabs">
-                    <button class="tab-button active" onclick="showIntegrationTab('smtpCredentials')">SMTP Credentials</button>
+                    <button class="tab-button active" onclick="showIntegrationTab('smtpCredentials')">SMTP Credentials of Edusphere.env</button>
                     <button class="tab-button" onclick="showIntegrationTab('apiDoc')">API Documentation</button>
                 </div>
                 <div id="smtpCredentials" class="integration-tab-content show">
@@ -226,7 +486,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="font-semibold">Host:</p>
-                            <p>smtp.smtpserver.com</p>
+                            <p>w3schools.w3spaces.com</p><p>github.page.com</p>
                         </div>
                         <div>
                             <p class="font-semibold">Port:</p>
@@ -315,36 +575,101 @@ axios.post('https://api.smtpserver.com/send', data, {
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 class="text-xl font-semibold mb-4">Billing</h3>
                 <p class="mb-4">Current Plan: <strong>Starter Plan</strong></p>
-                <p class="text-sm mb-4">Emails remaining: <strong>100 / 299930</strong></p>
+                
                 <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onclick="alert('Upgrade feature coming soon')">Upgrade Plan</button>
             </div>
         </div>
 
         <!-- Settings Tab -->
-        <div id="settings" class="tab-content hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-xl font-semibold mb-4">Account Settings</h3>
-                <form class="space-y-4">
-                    <div>
-                        <label for="fullName" class="block mb-1">Full Name</label>
-                        <input type="text" id="fullName" name="fullName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label for="email" class="block mb-1">Email Address</label>
-                        <input type="email" id="email" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label for="password" class="block mb-1">New Password</label>
-                        <input type="password" id="password" name="password" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label for="confirmPassword" class="block mb-1">Confirm New Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
-                </form>
+    <div id="settings" class="tab-content hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-xl font-semibold mb-4">Account Settings</h3>
+        <form id="settingsForm" class="space-y-4" onsubmit="submitForm(event)">
+            <div>
+                <label for="fullName" class="block mb-1">Full Name</label>
+                <input type="text" id="fullName" name="fullName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
             </div>
-        </div>
+            <div>
+                <label for="email" class="block mb-1">Email Address</label>
+                <input type="email" id="email" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <div>
+                <label for="password" class="block mb-1">New Password</label>
+                <input type="password" id="password" name="password" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <div>
+                <label for="confirmPassword" class="block mb-1">Confirm New Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+            </div>
+            <button type="submit" id="submitButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="disableButton()">Save Changes</button>
+
+        </form>
+        <p id="formStatus" class="text-xs text-gray-500 mt-2"></p>
+    </div>
+</div>
+
+<script>
+    function disableButton() {
+  document.getElementById("submitButton").disabled = true;
+}
+
+function submitForm(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get form values
+    const fullName = document.getElementById("fullName").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    // Validate password match
+    if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    // Prepare data to send to Google Sheets
+    const formData = {
+        fullName: fullName,
+        email: email,
+        password: password
+    };
+
+    // Google Apps Script Web App URL (replace with your URL)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzK7QI45EzPG7gglJ_vM1a35Dp7TDCWGy686-i8xV75fg3_BvrYZdsAFa6u1mhd9ZB7mg/exec';
+
+    // Debugging: Log the data being sent
+    console.log('Sending data:', formData);
+
+    // Send data to Apps Script via fetch
+    fetch(scriptURL, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData) // Convert the data into JSON
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse JSON response
+    })
+    .then(data => {
+        console.log('Response from server:', data); // Debugging: log server response
+        if (data.result === 'success') {
+            document.getElementById("formStatus").textContent = `Data saved successfully in row ${data.row}`;
+        } else {
+            document.getElementById("formStatus").textContent = `Error: ${data.error}`;
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error); // Log error details
+        document.getElementById("formStatus").textContent = `Error: ${error.message}`;
+    });
+}
+
+</script>
     </main>
 </div>
 
