@@ -14,7 +14,7 @@
 <div class="flex h-screen">
     <!-- Sidebar -->
     <aside class="w-64 bg-blue-600 text-white p-6">
-        <h1 class="text-2xl font-bold mb-8"> EduSphere </h1>
+        <h1 class="text-2xl font-bold mb-8"> Sugam Cloud </h1>
         <nav>
             <ul class="space-y-4">
                 <li><a href="#" class="flex items-center space-x-2 hover:bg-blue-700 p-2 rounded" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
@@ -44,6 +44,46 @@
 </div>
 
 
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD6BWxdK_BZpAH0SMXEIFy1uA7XdwBhddg",
+    authDomain: "teleport-b0434.firebaseapp.com",
+    projectId: "teleport-b0434",
+    storageBucket: "teleport-b0434.firebasestorage.app",
+    messagingSenderId: "873499675326",
+    appId: "1:873499675326:web:3e83e2e84b97a37c662cef",
+    measurementId: "G-PPZZTHST0M"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const provider = new GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/gmail.readonly'); // ✅ Add Gmail scope
+
+  document.getElementById("signInBtn").addEventListener("click", () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        const token = result._tokenResponse.oauthAccessToken;
+        console.log("User:", user.email);
+        console.log("Access Token:", token);
+
+        // TODO: Use the token to call Gmail API from a secure backend
+      })
+      .catch((error) => {
+        console.error("Error during sign-in:", error);
+      });
+  });
+</script>
+
+<button id="signInBtn">Sign in with Gmail</button>
 
   
 <style>
@@ -315,74 +355,171 @@ updateLiveData();
 </script>
 
             </div>
-        
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script>
+    // Validate email and enable button
+    function validateEmailInput() {
+        const emailInput = document.getElementById("emailInput").value.trim();
+        const fetchButton = document.getElementById("fetchButton");
+        const emailFetchStatus = document.getElementById("emailFetchStatus");
 
-        <!-- Email Logs Tab -->
-        <div id="emailLogs" class="tab-content hidden">
-            <div class="mb-4">
-                <label for="logsDateFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Filter:</label>
-                <select id="logsDateFilter" class="bg-white dark:bg-gray-800 rounded py-2 px-4" onchange="filterLogs(this.value)">
-                    <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
-                    <option value="7days">Last 7 Days</option>
-                    <option value="month">This Month</option>
-                    <option value="custom">Custom</option>
-                </select>
-                <input type="date" id="logsCustomStartDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden">
-                <input type="date" id="logsCustomEndDate" class="bg-white dark:bg-gray-800 rounded py-2 px-4 mt-2 hidden" onchange="filterLogs('custom')">
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <table class="w-full">
-                    <thead>
-                    <tr class="border-b dark:border-gray-700">
-                        <th class="text-left py-2">Date</th>
-                        <th class="text-left py-2">Recipient</th>
-                        <th class="text-left py-2">Subject</th>
-                        <th class="text-left py-2">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody id="emailLogsTable">
-                    <!-- Sample Logs -->
-                    <tr class="border-b dark:border-gray-700">
-                        <td class="py-2">2024-07-13 15:30</td>
-                        <td class="py-2">sugamkaistha95@gmail.com</td>
-                        <td class="py-2">Welcome to Our Service</td>
-                        <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Delivered</span></td>
-                    </tr>
-                    <tr class="border-b dark:border-gray-700">
-                        <td class="py-2">2024-07-13 15:28</td>
-                        <td class="py-2">agamkaistha11@gmail.com</td>
-                        <td class="py-2">Your Monthly Newsletter</td>
-                        <td class="py-2"><span class="bg-red-200 text-red-800 py-1 px-2 rounded-full text-sm">Bounced</span></td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">2024-07-13 15:25</td>
-                        <td class="py-2">ekantkholi1@gmail.com</td>
-                        <td class="py-2">Order Confirmation #12345</td>
-                        <td class="py-2"><span class="bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full text-sm">Failed</span></td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">2024-07-13 15:20</td>
-                        <td class="py-2">purvanshkaistha97@gmail.com</td>
-                        <td class="py-2">This Week's Updates</td>
-                        <td class="py-2"><span class="bg-blue-200 text-blue-800 py-1 px-2 rounded-full text-sm">Clicked</span></td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">2024-07-13 15:18</td>
-                        <td class="py-2">shubhamsahani112@gmail.com</td>
-                        <td class="py-2">Follow-up on Your Recent Purchase</td>
-                        <td class="py-2"><span class="bg-orange-200 text-orange-800 py-1 px-2 rounded-full text-sm">Opened</span></td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">2024-07-13 15:15</td>
-                        <td class="py-2">sugamkaistha12@gmail.com</td>
-                        <td class="py-2">Your Password Reset Link</td>
-                        <td class="py-2"><span class="bg-red-200 text-red-800 py-1 px-2 rounded-full text-sm">Complaint</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        const isValidEmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (isValidEmail.test(emailInput)) {
+            fetchButton.disabled = false;
+            emailFetchStatus.textContent = "";
+        } else {
+            fetchButton.disabled = true;
+            emailFetchStatus.textContent = "Please enter a valid Gmail address.";
+        }
+    }
+
+    // Fetch and store email log
+    function fetchEmailStats() {
+        const emailInputValue = document.getElementById("emailInput").value.trim();
+        const emailFetchStatus = document.getElementById("emailFetchStatus");
+
+        if (!emailInputValue) return;
+
+        emailFetchStatus.textContent = "Fetching email stats...";
+
+        setTimeout(() => {
+            const isSuccess = Math.random() > 0.3;
+            const status = isSuccess ? "Verified / Complete" : "Pending";
+
+            emailFetchStatus.textContent = isSuccess
+                ? `Fetch successful for ${emailInputValue}`
+                : `Fetch failed or incomplete for ${emailInputValue}`;
+
+            const log = {
+                email: emailInputValue,
+                time: new Date().toISOString(),
+                subject: "Stats Fetch",
+                status: status
+            };
+
+            const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
+            emailLogs.push(log);
+            localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
+            appendEmailLogToTable(log);
+        }, 2000);
+    }
+
+    // Append row to logs table
+    function appendEmailLogToTable(log) {
+        const table = document.getElementById('emailLogsTable');
+        const row = document.createElement('tr');
+        row.classList.add('border-b', 'dark:border-gray-700');
+
+        const logDate = new Date(log.time);
+        const formattedDate = logDate.getFullYear() + '-' +
+            String(logDate.getMonth() + 1).padStart(2, '0') + '-' +
+            String(logDate.getDate()).padStart(2, '0') + ' ' +
+            String(logDate.getHours()).padStart(2, '0') + ':' +
+            String(logDate.getMinutes()).padStart(2, '0');
+
+        const statusClass = log.status === "Verified / Complete"
+            ? "bg-green-200 text-green-800"
+            : "bg-yellow-200 text-yellow-800";
+
+        row.innerHTML = `
+            <td class="py-2">${formattedDate}</td>
+            <td class="py-2">${log.email}</td>
+            <td class="py-2">${log.subject}</td>
+            <td class="py-2">
+                <span class="${statusClass} py-1 px-2 rounded-full text-sm">
+                    ${log.status}
+                </span>
+            </td>
+        `;
+        table.appendChild(row);
+    }
+
+    // Load logs on page load
+    window.onload = function () {
+        const emailLogs = JSON.parse(localStorage.getItem('emailLogs')) || [];
+        emailLogs.forEach(log => appendEmailLogToTable(log));
+    };
+
+
+
+    function fetchEmailStats() {
+    const email = document.getElementById('emailInput').value.trim();
+    const status = document.getElementById('emailFetchStatus');
+
+    if (!email) {
+        status.textContent = "⚠️ Please enter a valid email first.";
+        return;
+    }
+
+    status.textContent = "Fetching live data for " + email + "...";
+
+    setTimeout(() => {
+        // Random simulated data
+        const totalEmailsSent = Math.floor(Math.random() * 10000) + 1;
+        const deliveryRate = (Math.random() * (99 - 80) + 80).toFixed(2); // between 80% - 99%
+        const failedEmails = Math.floor(Math.random() * 500);
+        const bouncedEmails = Math.floor(Math.random() * 300);
+        const openedEmails = Math.floor(Math.random() * totalEmailsSent * 0.7);
+        const clickedEmails = Math.floor(Math.random() * openedEmails * 0.5);
+
+        animateCount('totalEmailsSent', 0, totalEmailsSent, 1000);
+        animateCount('deliveryRate', 0, deliveryRate, 1000, '%');
+        animateCount('failedEmails', 0, failedEmails, 1000);
+        animateCount('bouncedEmails', 0, bouncedEmails, 1000);
+        animateCount('openedEmails', 0, openedEmails, 1000);
+        animateCount('clickedEmails', 0, clickedEmails, 1000);
+
+        status.textContent = "✅ Live data updated for " + email;
+    }, 1000);
+}
+
+function animateCount(id, start, end, duration, suffix = '') {
+    const element = document.getElementById(id);
+    let startTime = null;
+
+    function animation(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const progress = currentTime - startTime;
+        const value = Math.min(Math.floor((progress / duration) * (end - start) + start), end);
+        element.textContent = suffix ? value + suffix : value.toLocaleString();
+        if (value < end) {
+            requestAnimationFrame(animation);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+  </script>
+
+        
+  <div>
+    
+    
+
+    <p id="emailFetchStatus" class="text-xs text-gray-500 mt-2"></p>
+  </div>
+
+  <hr class="my-6">
+
+  <!-- Email Logs -->
+  <div id="emailLogs" class="tab-content">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b dark:border-gray-700">
+            <th class="text-left py-2">Date</th>
+            <th class="text-left py-2">Recipient</th>
+            <th class="text-left py-2">Subject</th>
+            <th class="text-left py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody id="emailLogsTable">
+          <!-- Logs appear here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 
         <!-- Domains Tab -->
         <div id="domains" class="tab-content hidden">
