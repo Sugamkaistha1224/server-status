@@ -34,56 +34,43 @@
             <h2 class="text-3xl font-semibold" id="pageTitle">Dashboard</h2>
           <div class="flex items-center space-x-4">
    <div class="relative">
-    <input type="search" placeholder="Search..." id="searchInput" 
+    <input type="search" placeholder="Search..." id="searchInput"
         class="bg-white dark:bg-gray-800 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
         oninput="highlightSearch()">
-    <button class="search-btn" type="button" onclick="highlightText()">
+    <button class="search-btn" type="button" onclick="highlightSearch()">
         <i class='bx bx-search'></i>
     </button>
     <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
 </div>
 
 
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+<script>
+function highlightSearch() {
+    const input = document.getElementById("searchInput");
+    const term = input.value.trim();
+    const content = document.getElementById("textContent");
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    // Remove previous highlights
+    removeHighlights(content);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyD6BWxdK_BZpAH0SMXEIFy1uA7XdwBhddg",
-    authDomain: "teleport-b0434.firebaseapp.com",
-    projectId: "teleport-b0434",
-    storageBucket: "teleport-b0434.firebasestorage.app",
-    messagingSenderId: "873499675326",
-    appId: "1:873499675326:web:3e83e2e84b97a37c662cef",
-    measurementId: "G-PPZZTHST0M"
-  };
+    if (term === "") return;
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    // Regex for case-insensitive search
+    const regex = new RegExp(`(${term})`, 'gi');
+    
+    // Replace matches with <mark> to highlight
+    content.innerHTML = content.textContent.replace(regex, `<mark>$1</mark>`);
+}
 
-  const provider = new GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/gmail.readonly'); // ✅ Add Gmail scope
-
-  document.getElementById("signInBtn").addEventListener("click", () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        const token = result._tokenResponse.oauthAccessToken;
-        console.log("User:", user.email);
-        console.log("Access Token:", token);
-
-        // TODO: Use the token to call Gmail API from a secure backend
-      })
-      .catch((error) => {
-        console.error("Error during sign-in:", error);
-      });
-  });
+function removeHighlights(element) {
+    // Clear any previous <mark> elements and reset text
+    element.innerHTML = element.textContent;
+}
 </script>
 
-<button id="signInBtn">Sign in with Gmail</button>
+
+
+
 
   
 <style>
@@ -130,25 +117,7 @@ function highlightTextInElement(element, input) {
     }
 }
 </script>
-<script type="text/javascript">
-    const { google } = require('googleapis');
 
-async function fetchUserEmails(accessToken) {
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: accessToken });
-
-  const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-
-  const res = await gmail.users.messages.list({
-    userId: 'me',
-    labelIds: ['SENT'],
-    maxResults: 10,
-  });
-
-  return res.data.messages;
-}
-
-</script>
                 
 
                 <div class="relative">
@@ -254,7 +223,7 @@ async function fetchUserEmails(accessToken) {
 </script>
 
 
-<!-- Stats Grid -->
+<!-- Stats Grid 
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold mb-2">Total Emails Sent</h3>
@@ -289,8 +258,8 @@ async function fetchUserEmails(accessToken) {
         <p id="clickedEmails" class="text-2xl font-bold text-blue-600">0</p>
     </div>
 </div>
+-->
 
-<!-- Script -->
 <script>
 function fetchEmailStats() {
     const email = document.getElementById('emailInput').value.trim();
@@ -375,138 +344,78 @@ updateLiveData();
             </div>
         <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <script>
-    // Validate email and enable button
-    function validateEmailInput() {
-        const emailInput = document.getElementById("emailInput").value.trim();
-        const fetchButton = document.getElementById("fetchButton");
-        const emailFetchStatus = document.getElementById("emailFetchStatus");
+   // ---------------- EMAIL LOG SECTION ----------------
+  function validateEmailInput() {
+    const emailInput = document.getElementById("emailInput").value.trim();
+    const fetchButton = document.getElementById("fetchButton");
+    const emailFetchStatus = document.getElementById("emailFetchStatus");
 
-        const isValidEmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (isValidEmail.test(emailInput)) {
-            fetchButton.disabled = false;
-            emailFetchStatus.textContent = "";
-        } else {
-            fetchButton.disabled = true;
-            emailFetchStatus.textContent = "Please enter a valid Gmail address.";
-        }
+    const isValidEmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (isValidEmail.test(emailInput)) {
+      fetchButton.disabled = false;
+      emailFetchStatus.textContent = "";
+    } else {
+      fetchButton.disabled = true;
+      emailFetchStatus.textContent = "Please enter a valid Gmail address.";
     }
+  }
 
-    // Fetch and store email log
-    function fetchEmailStats() {
-        const emailInputValue = document.getElementById("emailInput").value.trim();
-        const emailFetchStatus = document.getElementById("emailFetchStatus");
+  function fetchEmailStats() {
+    const emailInputValue = document.getElementById("emailInput").value.trim();
+    const emailFetchStatus = document.getElementById("emailFetchStatus");
 
-        if (!emailInputValue) return;
+    if (!emailInputValue) return;
 
-        emailFetchStatus.textContent = "Fetching email stats...";
-
-        setTimeout(() => {
-            const isSuccess = Math.random() > 0.3;
-            const status = isSuccess ? "Verified / Complete" : "Pending";
-
-            emailFetchStatus.textContent = isSuccess
-                ? `Fetch successful for ${emailInputValue}`
-                : `Fetch failed or incomplete for ${emailInputValue}`;
-
-            const log = {
-                email: emailInputValue,
-                time: new Date().toISOString(),
-                subject: "Stats Fetch",
-                status: status
-            };
-
-            const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
-            emailLogs.push(log);
-            localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
-            appendEmailLogToTable(log);
-        }, 2000);
-    }
-
-    // Append row to logs table
-    function appendEmailLogToTable(log) {
-        const table = document.getElementById('emailLogsTable');
-        const row = document.createElement('tr');
-        row.classList.add('border-b', 'dark:border-gray-700');
-
-        const logDate = new Date(log.time);
-        const formattedDate = logDate.getFullYear() + '-' +
-            String(logDate.getMonth() + 1).padStart(2, '0') + '-' +
-            String(logDate.getDate()).padStart(2, '0') + ' ' +
-            String(logDate.getHours()).padStart(2, '0') + ':' +
-            String(logDate.getMinutes()).padStart(2, '0');
-
-        const statusClass = log.status === "Verified / Complete"
-            ? "bg-green-200 text-green-800"
-            : "bg-yellow-200 text-yellow-800";
-
-        row.innerHTML = `
-            <td class="py-2">${formattedDate}</td>
-            <td class="py-2">${log.email}</td>
-            <td class="py-2">${log.subject}</td>
-            <td class="py-2">
-                <span class="${statusClass} py-1 px-2 rounded-full text-sm">
-                    ${log.status}
-                </span>
-            </td>
-        `;
-        table.appendChild(row);
-    }
-
-    // Load logs on page load
-    window.onload = function () {
-        const emailLogs = JSON.parse(localStorage.getItem('emailLogs')) || [];
-        emailLogs.forEach(log => appendEmailLogToTable(log));
-    };
-
-
-
-    function fetchEmailStats() {
-    const email = document.getElementById('emailInput').value.trim();
-    const status = document.getElementById('emailFetchStatus');
-
-    if (!email) {
-        status.textContent = "⚠️ Please enter a valid email first.";
-        return;
-    }
-
-    status.textContent = "Fetching live data for " + email + "...";
+    emailFetchStatus.textContent = "Fetching email stats...";
 
     setTimeout(() => {
-        // Random simulated data
-        const totalEmailsSent = Math.floor(Math.random() * 10000) + 1;
-        const deliveryRate = (Math.random() * (99 - 80) + 80).toFixed(2); // between 80% - 99%
-        const failedEmails = Math.floor(Math.random() * 500);
-        const bouncedEmails = Math.floor(Math.random() * 300);
-        const openedEmails = Math.floor(Math.random() * totalEmailsSent * 0.7);
-        const clickedEmails = Math.floor(Math.random() * openedEmails * 0.5);
+      const isSuccess = Math.random() > 0.3;
+      const status = isSuccess ? "Verified / Complete" : "Pending";
 
-        animateCount('totalEmailsSent', 0, totalEmailsSent, 1000);
-        animateCount('deliveryRate', 0, deliveryRate, 1000, '%');
-        animateCount('failedEmails', 0, failedEmails, 1000);
-        animateCount('bouncedEmails', 0, bouncedEmails, 1000);
-        animateCount('openedEmails', 0, openedEmails, 1000);
-        animateCount('clickedEmails', 0, clickedEmails, 1000);
+      emailFetchStatus.textContent = isSuccess
+        ? `Fetch successful for ${emailInputValue}`
+        : `Fetch failed or incomplete for ${emailInputValue}`;
 
-        status.textContent = "✅ Live data updated for " + email;
-    }, 1000);
-}
+      const log = {
+        email: emailInputValue,
+        time: new Date().toISOString(),
+        subject: "Stats Fetch",
+        status: status
+      };
 
-function animateCount(id, start, end, duration, suffix = '') {
-    const element = document.getElementById(id);
-    let startTime = null;
+      const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
+      emailLogs.push(log);
+      localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
+      appendEmailLogToTable(log);
+    }, 2000);
+  }
 
-    function animation(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const progress = currentTime - startTime;
-        const value = Math.min(Math.floor((progress / duration) * (end - start) + start), end);
-        element.textContent = suffix ? value + suffix : value.toLocaleString();
-        if (value < end) {
-            requestAnimationFrame(animation);
-        }
-    }
+  function appendEmailLogToTable(log) {
+    const table = document.getElementById('emailLogsTable');
+    const row = document.createElement('tr');
+    row.classList.add('border-b', 'dark:border-gray-700');
 
-    requestAnimationFrame(animation);
-}
+    const logDate = new Date(log.time);
+    const formattedDate = logDate.getFullYear() + '-' +
+      String(logDate.getMonth() + 1).padStart(2, '0') + '-' +
+      String(logDate.getDate()).padStart(2, '0') + ' ' +
+      String(logDate.getHours()).padStart(2, '0') + ':' +
+      String(logDate.getMinutes()).padStart(2, '0');
+
+    const statusClass = log.status === "Verified / Complete"
+      ? "bg-green-200 text-green-800"
+      : "bg-yellow-200 text-yellow-800";
+
+    row.innerHTML = `
+      <td class="py-2">${formattedDate}</td>
+      <td class="py-2">${log.email}</td>
+      <td class="py-2">${log.subject}</td>
+      <td class="py-2">
+        <span class="${statusClass} py-1 px-2 rounded-full text-sm">${log.status}</span>
+      </td>
+    `;
+    table.appendChild(row);
+  }
   </script>
 
         
@@ -540,24 +449,29 @@ function animateCount(id, start, end, duration, suffix = '') {
 
 
         <!-- Domains Tab -->
-        <div id="domains" class="tab-content hidden">
-            <div class="flex justify-between mb-6">
-                 <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
-       
-            </div>
-            
+       <div id="domains" class="tab-content hidden">
+    <div class="flex justify-between mb-6">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
+    </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <table class="w-full">
-                    <thead>
-                    <tr class="border-b dark:border-gray-700">
-                        <th class="text-left py-2">Domain</th>
-                        <th class="text-left py-2">Status</th>
-                        <th class="text-left py-2">Action</th>
-                    </tr>
-                    </thead>
-                   <tbody id="domainTableBody">
-                    <div id="domainModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b dark:border-gray-700">
+                    <th class="text-left py-2">Domain</th>
+                    <th class="text-left py-2">Status</th>
+                    <th class="text-left py-2">Action</th>
+                </tr>
+            </thead>
+            <tbody id="domainTableBody">
+                <!-- Dynamic rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Domain Modal -->
+<div id="domainModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
     <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h2 class="text-xl font-semibold mb-4">Add Domain</h2>
         <input type="url" id="domainInput" class="w-full p-2 mb-4 border rounded" placeholder="Enter domain URL">
@@ -566,112 +480,137 @@ function animateCount(id, start, end, duration, suffix = '') {
     </div>
 </div>
 
-                    <tr class="border-b dark:border-gray-700">
-                        <td class="py-2">https://sugamkaisthagroups.w3spaces.com/Edusphere.html</td>
-                        <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
-                        <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">https://sugam-navation.w3spaces.com/Dashboard-Edusphere.html</td>
-                        <td class="py-2"><span class="bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full text-sm">Pending</span></td>
-                        <td class="py-2"><a href="#" class="text-blue-600 hover:underline">Verify Now</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
 <script>
-    // Show the Add Domain Modal
-    function showDomainModal() {
-        document.getElementById("domainModal").classList.remove("hidden");
+  // ---------------- DOMAIN SECTION ----------------
+
+  function showDomainModal() {
+    document.getElementById("domainModal").classList.remove("hidden");
+  }
+
+  function closeDomainModal() {
+    document.getElementById("domainModal").classList.add("hidden");
+  }
+
+  function addDomain() {
+    const domainInput = document.getElementById("domainInput").value.trim();
+    if (!domainInput) {
+      alert("Please enter a valid domain.");
+      return;
     }
 
-    // Close the Add Domain Modal
-    function closeDomainModal() {
-        document.getElementById("domainModal").classList.add("hidden");
-    }
+    const tableBody = document.getElementById("domainTableBody");
+    const newRow = document.createElement("tr");
 
-    // Show the Add Email Sender Modal
-    function showEmailSenderModal() {
-        document.getElementById("emailSenderModal").classList.remove("hidden");
-    }
+    newRow.innerHTML = `
+      <td class="py-2">${domainInput}</td>
+      <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
+      <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
+    `;
+    tableBody.appendChild(newRow);
+    saveDomainToLocalStorage(domainInput);
+    closeDomainModal();
+  }
 
-    // Close the Add Email Sender Modal
-    function closeEmailSenderModal() {
-        document.getElementById("emailSenderModal").classList.add("hidden");
-    }
+  function saveDomainToLocalStorage(domain) {
+    const domains = JSON.parse(localStorage.getItem("domains")) || [];
+    domains.push(domain);
+    localStorage.setItem("domains", JSON.stringify(domains));
+  }
 
-    // Add Domain to the table and mark it as "Verified"
-    function addDomain() {
-        const domainInput = document.getElementById("domainInput").value.trim();
+  function loadDomains() {
+    const storedDomains = JSON.parse(localStorage.getItem("domains")) || [];
+    const tableBody = document.getElementById("domainTableBody");
 
-        // Validate domain input
-        if (!domainInput) {
-            alert("Please enter a valid domain.");
-            return;
-        }
+    storedDomains.forEach(domain => {
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+        <td class="py-2">${domain}</td>
+        <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
+        <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
+      `;
+      tableBody.appendChild(newRow);
+    });
+  }
 
-        // Create new row in the table
-        const tableBody = document.getElementById("domainTableBody");
-        const newRow = document.createElement("tr");
+  // ---------------- COMBINED ONLOAD ----------------
+  window.onload = function () {
+    // Load both logs on page load
+    const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
+    emailLogs.forEach(log => appendEmailLogToTable(log));
 
-        newRow.innerHTML = `
-            <td class="py-2">${domainInput}</td>
-            <td class="py-2"><span class="bg-green-200 text-green-800 py-1 px-2 rounded-full text-sm">Verified</span></td>
-            <td class="py-2"><a href="#" class="text-blue-600 hover:underline">View Details</a></td>
-        `;
-        tableBody.appendChild(newRow);
-
-        // Close the modal after adding domain
-        closeDomainModal();
-    }
-
+    loadDomains();
+  };
 
 </script>
-        <!-- Integration Tab -->
-        <div id="integration" class="tab-content hidden">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <div class="tabs">
-                    <button class="tab-button active" onclick="showIntegrationTab('smtpCredentials')">SMTP Credentials of Edusphere.env</button>
-                    <button class="tab-button" onclick="showIntegrationTab('apiDoc')">API Documentation</button>
-                </div>
-                <div id="smtpCredentials" class="integration-tab-content show">
-                    <h3 class="text-xl font-semibold mb-4">SMTP Credentials</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="font-semibold">Host:</p>
-                            <p>w3schools.w3spaces.com</p><p>github.page.com</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Port:</p>
-                            <p>587</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Username:</p>
-                            <p>your_username</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold">Password:</p>
-                            <p>••••••••••••</p>
-                            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regeneratePassword()">Regenerate Password</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="apiDoc" class="integration-tab-content">
-                    <h3 class="text-xl font-semibold mb-4">API Documentation</h3>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regenerateApiKey()">Generate New API Key</button>
-                    <p class="mt-4 font-semibold">API Key:</p>
-                    <p>sk_live_abcdefghijklmnopqrstuvwxyz123456</p>
 
-                    <h4 class="text-lg mt-6">API Usage</h4>
-                    <div class="tabs">
-                        <button class="tab-button active" onclick="showApiExample('curl')">CURL</button>
-                        <button class="tab-button" onclick="showApiExample('python')">Python</button>
-                        <button class="tab-button" onclick="showApiExample('nodejs')">Node.js</button>
-                    </div>
-                    <div id="curl" class="api-example show">
-                        <pre><code>// Example usage with CURL
+
+
+        <!-- Integration Tab -->
+     <!-- Integration Tab -->
+<div id="integration" class="tab-content hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+
+    <!-- Tab Switcher -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="showIntegrationTab('smtpCredentials')">SMTP Credentials of Edusphere.env</button>
+      <button class="tab-button" onclick="showIntegrationTab('apiDoc')">API Documentation</button>
+    </div>
+
+    <!-- SMTP Credentials Tab -->
+    <div id="smtpCredentials" class="integration-tab-content show">
+      <h3 class="text-xl font-semibold mb-4">SMTP Credentials</h3>
+      <div class="grid grid-cols-2 gap-4">
+
+        <div>
+          <p class="font-semibold">Host:</p>
+          <p>w3schools.w3spaces.com</p>
+          <p>github.page.com</p>
+        </div>
+        <div>
+          <p class="font-semibold">Port:</p>
+          <p>587</p>
+        </div>
+        <div>
+          <p class="font-semibold">Username:</p>
+          <p>your_username</p>
+        </div>
+        <div>
+          <p class="font-semibold">Password:</p>
+          <p>••••••••••••</p>
+        </div>
+
+        <input type="text" id="smtpHost" placeholder="SMTP Host" class="border p-2 rounded mt-1" />
+        <input type="text" id="smtpPort" placeholder="Port" class="border p-2 rounded mt-1" />
+        <input type="text" id="smtpUser" placeholder="Username" class="border p-2 rounded mt-1" />
+        <input type="password" id="smtpPass" placeholder="Password" class="border p-2 rounded mt-1" />
+
+        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regeneratePassword()">Regenerate Password</button>
+        <button onclick="saveSMTP()" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Save SMTP</button>
+        <button onclick="testSMTPConnection()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Test Connection</button>
+
+        <a href="assets/sample-postman.json" download class="text-blue-500 hover:underline mt-4 inline-block">Download Postman Collection</a>
+      </div>
+    </div>
+
+    <!-- API Documentation Tab -->
+    <div id="apiDoc" class="integration-tab-content hidden">
+      <h3 class="text-xl font-semibold mb-4">API Documentation</h3>
+      <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2" onclick="regenerateApiKey()">Generate New API Key</button>
+
+      <div class="flex items-center space-x-2 mt-4">
+        <p id="apiKeyText">sk_live_abcdefghijklmnopqrstuvwxyz123456</p>
+        <button onclick="copyToClipboard('apiKeyText')" class="text-blue-500 hover:underline">Copy</button>
+      </div>
+
+      <h4 class="text-lg mt-6">API Usage</h4>
+      <div class="tabs">
+        <button class="tab-button active" onclick="showApiExample('curl')">CURL</button>
+        <button class="tab-button" onclick="showApiExample('python')">Python</button>
+        <button class="tab-button" onclick="showApiExample('nodejs')">Node.js</button>
+      </div>
+
+      <div id="curl" class="api-example show">
+        <pre><code>// Example usage with CURL
 curl -X POST https://api.smtpserver.com/send \
      -H "Authorization: Bearer YOUR_API_KEY" \
      -H "Content-Type: application/json" \
@@ -680,15 +619,16 @@ curl -X POST https://api.smtpserver.com/send \
           "subject": "Hello World",
           "text": "This is a test email"
          }'</code></pre>
-                    </div>
-                    <div id="python" class="api-example hidden">
-                        <pre><code>// Example usage with Python
+      </div>
+
+      <div id="python" class="api-example hidden">
+        <pre><code>// Example usage with Python
 import requests
 
 url = "https://api.smtpserver.com/send"
 payload = {
     "to": "user@example.com",
-        "subject": "Hello World",
+    "subject": "Hello World",
     "text": "This is a test email"
 }
 headers = {
@@ -697,9 +637,10 @@ headers = {
 }
 response = requests.post(url, json=payload, headers=headers)
 print(response.json())</code></pre>
-                    </div>
-                    <div id="nodejs" class="api-example hidden">
-                        <pre><code>// Example usage with Node.js
+      </div>
+
+      <div id="nodejs" class="api-example hidden">
+        <pre><code>// Example usage with Node.js
 const axios = require('axios');
 
 const data = {
@@ -720,11 +661,145 @@ axios.post('https://api.smtpserver.com/send', data, {
 .catch(error => {
     console.error(error);
 });</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script>
+function saveSMTP() {
+  const smtp = {
+    host: document.getElementById('smtpHost').value,
+    port: document.getElementById('smtpPort').value,
+    user: document.getElementById('smtpUser').value,
+    pass: document.getElementById('smtpPass').value
+  };
+  localStorage.setItem("smtpSettings", JSON.stringify(smtp));
+  alert("SMTP settings saved!");
+}
+
+window.addEventListener('load', () => {
+  const smtp = JSON.parse(localStorage.getItem("smtpSettings"));
+  if (smtp) {
+    document.getElementById('smtpHost').value = smtp.host;
+    document.getElementById('smtpPort').value = smtp.port;
+    document.getElementById('smtpUser').value = smtp.user;
+    document.getElementById('smtpPass').value = smtp.pass;
+  }
+  checkApiKeyExpiry();
+});
+
+function testSMTPConnection() {
+  const smtp = JSON.parse(localStorage.getItem("smtpSettings"));
+  if (!smtp) return alert("Please save SMTP settings first.");
+  fetch('/api/test-smtp', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(smtp)
+})
+.then(res => res.json())
+.then(data => {
+  if (data.success) {
+    alert("SMTP connection successful!");
+  } else {
+    alert("SMTP connection failed: " + data.message);
+  }
+})
+.catch(err => {
+  alert("Error testing SMTP connection: " + err.message);
+});
+
+
+}
+
+function regeneratePassword() {
+  const newPassword = Math.random().toString(36).slice(-10);
+  alert("New password generated: " + newPassword);
+}
+
+function regenerateApiKey() {
+  const newApiKey = 'sk_live_' + Math.random().toString(36).substring(2, 20);
+  const keyData = {
+    key: newApiKey,
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem('apiKeyData', JSON.stringify(keyData));
+  document.getElementById('apiKeyText').textContent = newApiKey;
+  alert("New API key generated!");
+}
+
+function copyToClipboard(elementId) {
+  const text = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(text)
+    .then(() => alert("Copied to clipboard!"))
+    .catch(() => alert("Failed to copy."));
+}
+
+function checkApiKeyExpiry() {
+  const data = JSON.parse(localStorage.getItem('apiKeyData'));
+  if (!data) return;
+  const created = new Date(data.createdAt);
+  const now = new Date();
+  const ageInDays = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+  if (ageInDays > 30) {
+    alert("Your API key is over 30 days old. Consider regenerating.");
+  }
+}
+
+function showIntegrationTab(tabId) {
+  document.querySelectorAll('.integration-tab-content').forEach(tab => {
+    tab.classList.add('hidden');
+  });
+  document.getElementById(tabId).classList.remove('hidden');
+  document.querySelectorAll('.tabs .tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+}
+
+function showApiExample(exampleId) {
+  document.querySelectorAll('.api-example').forEach(tab => {
+    tab.classList.add('hidden');
+  });
+  document.getElementById(exampleId).classList.remove('hidden');
+  document.querySelectorAll('#apiDoc .tabs .tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+}
+</script>
+
+<script type="text/javascript">
+    const express = require('express');
+const nodemailer = require('nodemailer');
+const router = express.Router();
+
+router.post('/api/test-smtp', async (req, res) => {
+  const { host, port, user, pass } = req.body;
+
+  let transporter = nodemailer.createTransport({
+    host,
+    port: parseInt(port),
+    secure: port === '465', // true for 465, false for others
+    auth: {
+      user,
+      pass
+    }
+  });
+
+  try {
+    await transporter.verify();
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
+
+module.exports = router;
+
+</script>
         <!-- Billing Tab -->
         <div id="billing" class="tab-content hidden">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
