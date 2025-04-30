@@ -424,7 +424,11 @@ updateLiveData();
   const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
 
   if (googleEmail) {
-    const alreadyLogged = emailLogs.some(entry => entry.email === googleEmail && entry.subject === "Google Sign-In");
+    // Avoid duplicate log entries
+    const alreadyLogged = emailLogs.some(
+      entry => entry.email === googleEmail && entry.subject === "Google Sign-In"
+    );
+
     if (!alreadyLogged) {
       const log = {
         email: googleEmail,
@@ -440,7 +444,14 @@ updateLiveData();
 
   // Load all logs
   emailLogs.forEach(appendEmailLogToTable);
+
+  // Display the currently signed-in Gmail
+  const logEl = document.getElementById('emailLog');
+  if (logEl && googleEmail) {
+    logEl.innerHTML = `<strong>Signed in with:</strong> ${googleEmail}`;
+  }
 });
+
 </script>
 
 <!-- Email Status -->
@@ -453,6 +464,7 @@ updateLiveData();
 <!-- Email Logs Section -->
 <div id="emailLogs" class="tab-content">
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div id="emailLog" class="p-4 text-sm text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-700 rounded mb-4"></div>
     <table class="w-full">
       <thead>
         <tr class="border-b dark:border-gray-700">
