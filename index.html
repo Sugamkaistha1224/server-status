@@ -420,37 +420,37 @@ updateLiveData();
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    const googleEmail = localStorage.getItem('googleUserEmail');
-    const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
+  const googleEmail = localStorage.getItem('googleUserEmail');
+  const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
 
-    // Show Gmail on top
-    const emailLogDiv = document.getElementById('emailLog');
-    if (googleEmail && emailLogDiv) {
-      emailLogDiv.innerHTML = `<strong>Signed in with:</strong> ${googleEmail}`;
+  if (googleEmail) {
+    // Avoid duplicate log entries
+    const alreadyLogged = emailLogs.some(
+      entry => entry.email === googleEmail && entry.subject === "Google Sign-In"
+    );
+
+    if (!alreadyLogged) {
+      const log = {
+        email: googleEmail,
+        time: new Date().toISOString(),
+        subject: "Google Sign-In",
+        status: "Verified / Complete"
+      };
+      emailLogs.push(log);
+      localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
+      appendEmailLogToTable(log);
     }
+  }
 
-    // Add Google login to log table if not already logged
-    if (googleEmail) {
-      const alreadyLogged = emailLogs.some(entry =>
-        entry.email === googleEmail && entry.subject === "Google Sign-In"
-      );
+  // Load all logs
+  emailLogs.forEach(appendEmailLogToTable);
 
-      if (!alreadyLogged) {
-        const log = {
-          email: googleEmail,
-          time: new Date().toISOString(),
-          subject: "Google Sign-In",
-          status: "Verified / Complete"
-        };
-        emailLogs.push(log);
-        localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
-        appendEmailLogToTable(log);
-      }
-    }
-
-    // Show all logs
-    emailLogs.forEach(appendEmailLogToTable);
-  });
+  // Display the currently signed-in Gmail
+  const logEl = document.getElementById('emailLog');
+  if (logEl && googleEmail) {
+    logEl.innerHTML = `<strong>Signed in with:</strong> ${googleEmail}`;
+  }
+});
 
 </script>
 
@@ -465,7 +465,7 @@ updateLiveData();
 <div id="emailLogs" class="tab-content">
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
     <!-- Display Signed-in Email -->
-<div id="emailLog" class="p-4 text-sm text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-700 rounded mb-4">
+<div id="emailLog" class="p-4 text-sm text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-700 rounded mb-4"></div>
 
     <table class="w-full">
       <thead>
@@ -482,7 +482,7 @@ updateLiveData();
     </table>
   </div>
 </div>
-</div>
+
 <!-- Domains Tab (Unchanged) -->
 <div id="domains" class="tab-content hidden">
   <div class="flex justify-between mb-6">
