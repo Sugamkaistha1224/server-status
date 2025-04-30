@@ -342,9 +342,11 @@ updateLiveData();
 </script>
 
             </div>
-        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <script>
-   // ---------------- EMAIL LOG SECTION ----------------
+       <!-- FontAwesome (optional icons) -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+  // ---------------- EMAIL LOG SECTION ----------------
   function validateEmailInput() {
     const emailInput = document.getElementById("emailInput").value.trim();
     const fetchButton = document.getElementById("fetchButton");
@@ -416,59 +418,79 @@ updateLiveData();
     `;
     table.appendChild(row);
   }
-  </script>
 
-        
-  <div>
-    
-    
+  window.addEventListener('DOMContentLoaded', () => {
+  const googleEmail = localStorage.getItem('googleUserEmail');
+  const emailLogs = JSON.parse(localStorage.getItem("emailLogs")) || [];
 
-    <p id="emailFetchStatus" class="text-xs text-gray-500 mt-2"></p>
-  </div>
+  if (googleEmail) {
+    const alreadyLogged = emailLogs.some(entry => entry.email === googleEmail && entry.subject === "Google Sign-In");
+    if (!alreadyLogged) {
+      const log = {
+        email: googleEmail,
+        time: new Date().toISOString(),
+        subject: "Google Sign-In",
+        status: "Verified / Complete"
+      };
+      emailLogs.push(log);
+      localStorage.setItem("emailLogs", JSON.stringify(emailLogs));
+      appendEmailLogToTable(log);
+    }
+  }
 
-  <hr class="my-6">
+  // Load all logs
+  emailLogs.forEach(appendEmailLogToTable);
+});
+</script>
 
-  <!-- Email Logs -->
-  <div id="emailLogs" class="tab-content">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b dark:border-gray-700">
-            <th class="text-left py-2">Date</th>
-            <th class="text-left py-2">Recipient</th>
-            <th class="text-left py-2">Subject</th>
-            <th class="text-left py-2">Status</th>
-          </tr>
-        </thead>
-        <tbody id="emailLogsTable">
-          <!-- Logs appear here -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-
-        <!-- Domains Tab -->
-       <div id="domains" class="tab-content hidden">
-    <div class="flex justify-between mb-6">
-        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b dark:border-gray-700">
-                    <th class="text-left py-2">Domain</th>
-                    <th class="text-left py-2">Status</th>
-                    <th class="text-left py-2">Action</th>
-                </tr>
-            </thead>
-            <tbody id="domainTableBody">
-                <!-- Dynamic rows will be added here -->
-            </tbody>
-        </table>
-    </div>
+<!-- Email Status -->
+<div>
+  <p id="emailFetchStatus" class="text-xs text-gray-500 mt-2"></p>
 </div>
+
+<hr class="my-6">
+
+<!-- Email Logs Section -->
+<div id="emailLogs" class="tab-content">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b dark:border-gray-700">
+          <th class="text-left py-2">Date</th>
+          <th class="text-left py-2">Recipient</th>
+          <th class="text-left py-2">Subject</th>
+          <th class="text-left py-2">Status</th>
+        </tr>
+      </thead>
+      <tbody id="emailLogsTable">
+        <!-- Logs dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Domains Tab (Unchanged) -->
+<div id="domains" class="tab-content hidden">
+  <div class="flex justify-between mb-6">
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" onclick="showDomainModal()">Add Domain</button>
+  </div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b dark:border-gray-700">
+          <th class="text-left py-2">Domain</th>
+          <th class="text-left py-2">Status</th>
+          <th class="text-left py-2">Action</th>
+        </tr>
+      </thead>
+      <tbody id="domainTableBody">
+        <!-- Dynamic rows will be added here -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 <!-- Domain Modal -->
 <div id="domainModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
